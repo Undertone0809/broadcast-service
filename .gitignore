@@ -1,0 +1,4 @@
+.idea
+broadcast_service.egg-info/
+dist/
+venv/

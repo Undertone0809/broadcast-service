@@ -4,7 +4,7 @@
 # @File    : _core.py
 # @Software: PyCharm
 
-__all__ = ['broadcast_service', 'broadcast_service']
+__all__ = ['broadcast_service']
 
 class BroadcastService:
     """
@@ -15,15 +15,19 @@ class BroadcastService:
     example:
     app.py
     ---------------------------------------------------------------------------------
-    from broadcast_service.broadcast_service import broadcast_service
-    def handle_info(params):
-    print(params)
+    from broadcast_service import broadcast_service
+
+    def handle_msg(params):
+        print(params)
 
     if __name__ == '__main__':
-        a = 10
+        info = 'This is very important msg'
 
-        broadcast_service.listen('test', handle_info)
-        broadcast_service.broadcast('test',params=10)
+        # listen topic
+        broadcast_service.listen('Test', handle_msg)
+
+        # publish broadcast
+        broadcast_service.broadcast('Test', info)
     ---------------------------------------------------------------------------------
 
     """

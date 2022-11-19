@@ -1,6 +1,6 @@
 # broadcast-service
 
-broadcast-service is a lightweight third-party library. You can easily construct a broadcast pattern through this library.
+broadcast-service is a lightweight third-party python broadcast library. You can easily construct a broadcast pattern through this library.
 
 ## setup
 
@@ -14,7 +14,7 @@ pip install broadcast-service
 There is a easy demo to show how to use broadcast-service.
 
 ```python
-from broadcast_service.broadcast_service import broadcast_service
+from broadcast_service import broadcast_service
 
 def handle_msg(params):
     print(params)

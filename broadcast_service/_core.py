@@ -67,7 +67,7 @@ class BroadcastService:
             }
             self.subscribe_info[topic_name].append(options)
 
-    def broadcast(self, topic_name, params=None):
+    def broadcast(self, topic_name, *args, **kwargs):
         """ Launch broadcast on the specifide topic """
         if topic_name not in self.topic_list:
             self.topic_list.append(topic_name)
@@ -76,11 +76,10 @@ class BroadcastService:
             return
 
         for item in self.subscribe_info[topic_name]:
-            params = params if not None else None
             if self.enable_multithread:
-                self.thread_pool.submit(item['callback_function'], params)
+                self.thread_pool.submit(item['callback_function'], *args, **kwargs)
             else:
-                item['callback_function'](params)
+                item['callback_function'](*args, **kwargs)
 
     def stop_listen(self, topic_name, callback):
         if topic_name not in self.subscribe_info.keys():

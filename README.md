@@ -1,15 +1,15 @@
 # broadcast-service
 
-broadcast-service is a lightweight third-party python broadcast library. You can easily construct a broadcast pattern through this library.
+broadcast-service is a lightweight python broadcast library. You can easily construct a broadcast pattern through this library.
 
-## setup
+## Setup
 
 ```sh
 pip install broadcast-service
 ```
 
 
-## usage
+## Usage
 
 There is a easy demo to show how to use broadcast-service.
 

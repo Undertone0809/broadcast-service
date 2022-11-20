@@ -4,6 +4,8 @@
 # @File    : _core.py
 # @Software: PyCharm
 
+from concurrent.futures import ThreadPoolExecutor
+
 __all__ = ['broadcast_service']
 
 class BroadcastService:
@@ -51,6 +53,8 @@ class BroadcastService:
         """
         self.topic_list = []
         self.subscribe_info = {}
+        self.enable_multithread = True
+        self.thread_pool = ThreadPoolExecutor(max_workers=5)
 
     def listen(self, topic_name, callback):
         """ listen topic """
@@ -72,10 +76,11 @@ class BroadcastService:
             return
 
         for item in self.subscribe_info[topic_name]:
-            if params is not None:
-                item['callback_function'](params)
+            params = params if not None else None
+            if self.enable_multithread:
+                self.thread_pool.submit(item['callback_function'], params)
             else:
-                item['callback_function']()
+                item['callback_function'](params)
 
     def stop_listen(self, topic_name, callback):
         if topic_name not in self.subscribe_info.keys():

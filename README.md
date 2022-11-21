@@ -30,6 +30,8 @@ if __name__ == '__main__':
 
 ```
 
+You can see more example in [example](/example).
+
 ## TODO
 
 - optimize documents and show more examples.

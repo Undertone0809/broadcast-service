@@ -19,12 +19,17 @@ import random
 class Application:
     """
     This demo aim to show how to use broadcast-service.
-    Scene: One day, leader Tom arrive the company but find not one staff in company
+    Scene:
+        One day, leader Tom arrive the company but find not one staff in company
         because all staff are playing outside. Therefor, leader Tom send a message
         everyone must must return to company now. Staff Jack, Jasmine, Jane go back
         now when they receive it. Actually, they need different time to go back
         in different places. When they return, they need to declare that they are back.
-    Leader send a message said there would be a meeting at 10:00
+    Attention:
+        broadcast-service is asynchronous by defalut. If you want to close the async
+        state. You can use:
+            broadcast_service.enable_async = False
+        to close the async statement.
 
     """
     def __init__(self):

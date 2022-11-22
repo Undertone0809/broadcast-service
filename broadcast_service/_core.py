@@ -61,7 +61,7 @@ class BroadcastService:
         """
         self.topic_list = []
         self.subscribe_info = {}
-        self.enable_multithread = True
+        self.enable_async = True
         self.thread_pool = ThreadPoolExecutor(max_workers=5)
 
     def listen(self, topic_name, callback):
@@ -84,7 +84,7 @@ class BroadcastService:
             return
 
         for item in self.subscribe_info[topic_name]:
-            if self.enable_multithread:
+            if self.enable_async:
                 self.thread_pool.submit(item['callback_function'], *args, **kwargs)
             else:
                 item['callback_function'](*args, **kwargs)

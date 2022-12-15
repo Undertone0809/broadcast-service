@@ -14,9 +14,11 @@
 
 from broadcast_service import broadcast_service
 
+
 def handle_msg(info, info2):
     print(info)
     print(info2)
+
 
 if __name__ == '__main__':
     info = 'This is very important msg'

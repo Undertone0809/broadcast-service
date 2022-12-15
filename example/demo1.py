@@ -16,15 +16,16 @@ from broadcast_service import broadcast_service
 import time
 import random
 
+
 class Application:
     """
     This demo aim to show how to use broadcast-service.
     Scene:
         One day, leader Tom arrive the company but find not one staff in company
-        because all staff are playing outside. Therefor, leader Tom send a message
-        everyone must must return to company now. Staff Jack, Jasmine, Jane go back
-        now when they receive it. Actually, they need different time to go back
-        in different places. When they return, they need to declare that they are back.
+        because all staff are playing outside. Therefor, Tom send a message
+        everyone must must return to company now. Jack, Jasmine, Jane go back
+        now when they receive the message. Actually, they need different time to go back
+        in different places and they need to declare that they are back when they back.
     Attention:
         broadcast-service is asynchronous by defalut. If you want to close the async
         state. You can use:
@@ -32,6 +33,7 @@ class Application:
         to close the async statement.
 
     """
+
     def __init__(self):
         self.leader = Leader('Tom')
         self.staff1 = Staff('Jack')
@@ -43,17 +45,21 @@ class Application:
         self.current_time = time.time()
         self.leader.notice_go_back()
 
+
 def print_time():
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+
 
 class Leader:
     def __init__(self, name):
         self.name = name
 
     def notice_go_back(self):
-        print('[{1}] {0}(leader) notice meeting now.'.format(self.name, print_time()))
+        print('[{1}] {0}(leader) notice meeting now.'.format(
+            self.name, print_time()))
         meeting_info = 'You guys must go back now!'
         broadcast_service.broadcast('meeting', meeting_info)
+
 
 class Staff:
     def __init__(self, name):
@@ -64,10 +70,16 @@ class Staff:
         broadcast_service.listen('meeting', self.go_back)
 
     def go_back(self, info):
-        print("[{2}] {0}(staff) receive msg '{1}' and go back now.".format(self.name, info, print_time()))
+        print("[{2}] {0}(staff) receive msg '{1}' and go back now.".format(
+            self.name, info, print_time()))
         time.sleep(random.randint(1, 5))
         print('[{1}] {0}(staff) is back now.'.format(self.name, print_time()))
 
-if __name__ == '__main__':
+
+def main():
     app = Application()
     app.run()
+
+
+if __name__ == '__main__':
+    main()

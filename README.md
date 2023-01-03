@@ -1,6 +1,11 @@
 # broadcast-service
 broadcast-service is a lightweight python broadcast library. You can easily construct a broadcast pattern through this library.
 
+## Features
+- A publishing subscriber pattern can be built with a very simple syntax
+- Support different application scenarios, such as asynchronous and synchronous
+- Provide different syntax writing modes for lambda, callback functions, decorators, etc
+
 ## Setup
 ```sh
 pip install broadcast-service

@@ -37,24 +37,35 @@ There is a easy demo to show how to use broadcast-service.
 ```python
 from broadcast_service import broadcast_service
 
+# callback of common method
 def handle_msg(params):
+    print(params)
+
+
+# callback of decorator
+@broadcast_service.on_listen(['my_topic'])
+def handle_decorator_msg(params):
     print(params)
 
 if __name__ == '__main__':
     info = 'This is very important msg'
 
-    # listen topic
-    broadcast_service.subscribe('Test', handle_msg)
+    # subscribe topic
+    broadcast_service.subscribe('my_topic', handle_msg)
 
     # publish broadcast
-    broadcast_service.publish('Test', info)
+    broadcast_service.publish('my_topic', info)
 
 ```
 
-You can also add more params or no params when you publish thr broadcast.
+- You can use `publish, emit, broadcast` to send your topic msg and use `listen, on, subscribe` to listen your topic msg.
+
+- You can also add more arguments or no argument when you publish thr broadcast.
 ```python
 from broadcast_service import broadcast_service
 
+# subscribe topic
+@broadcast_service.on_listen(['my_topic'])
 def handle_msg(info, info2):
     print(info)
     print(info2)
@@ -63,31 +74,32 @@ if __name__ == '__main__':
     info = 'This is very important msg'
     info2 = 'This is also a very important msg.'
 
-    # listen topic
-    broadcast_service.subscribe('Test', handle_msg)
-
     # publish broadcast
-    broadcast_service.publish('Test', info, info2)
+    broadcast_service.publish('my_topic', info, info2)
 ```
 ```python
 from broadcast_service import broadcast_service
 
+# subscribe topic
+@broadcast_service.on_listen(['my_topic'])
 def handle_msg():
     print('handle_msg callback')
 
 if __name__ == '__main__':
-    # listen topic
-    broadcast_service.subscribe('Test', handle_msg)
-
     # publish broadcast
     broadcast_service.publish('Test')
 ```
+
+You can use decorator to subscirbe your
+
 Actually, you can see more example in [example](/example) and [tests](/tests).
 
 ## TODO
 - optimize documents and show more examples.
-- optimize the syntax expression of broadcast-service
+- ~~optimize the syntax expression of broadcast-service~~
 - provide more test cases
+- privide the ability to subscribe the topic and callback once
+- Support for fuzzy subscriptions
 
 
 ## Contribution

@@ -20,7 +20,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setuptools.setup(
     name="broadcast_service",
-    version="1.1.6",
+    version="1.1.7",
     author="Zeeland",
     author_email="zeeland@foxmail.com",
     description="A lightweight third-party broadcast library",

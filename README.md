@@ -44,10 +44,10 @@ if __name__ == '__main__':
     info = 'This is very important msg'
 
     # listen topic
-    broadcast_service.listen('Test', handle_msg)
+    broadcast_service.subscribe('Test', handle_msg)
 
     # publish broadcast
-    broadcast_service.broadcast('Test', info)
+    broadcast_service.publish('Test', info)
 
 ```
 
@@ -64,10 +64,10 @@ if __name__ == '__main__':
     info2 = 'This is also a very important msg.'
 
     # listen topic
-    broadcast_service.listen('Test', handle_msg)
+    broadcast_service.subscribe('Test', handle_msg)
 
     # publish broadcast
-    broadcast_service.broadcast('Test', info, info2)
+    broadcast_service.publish('Test', info, info2)
 ```
 ```python
 from broadcast_service import broadcast_service
@@ -77,12 +77,12 @@ def handle_msg():
 
 if __name__ == '__main__':
     # listen topic
-    broadcast_service.listen('Test', handle_msg)
+    broadcast_service.subscribe('Test', handle_msg)
 
     # publish broadcast
-    broadcast_service.broadcast('Test')
+    broadcast_service.publish('Test')
 ```
-Actually, you can see more example in [example](/example).
+Actually, you can see more example in [example](/example) and [tests](/tests).
 
 ## TODO
 - optimize documents and show more examples.

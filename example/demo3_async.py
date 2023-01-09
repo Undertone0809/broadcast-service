@@ -19,7 +19,7 @@ import random
 
 class Application:
     """
-    This demo aim to show how to use broadcast-service.
+    This demo shows how to use async.
     Scene:
         One day, leader Tom arrive the company but find not one staff in company
         because all staff are playing outside. Therefor, Tom send a message
@@ -64,19 +64,17 @@ class Leader:
 class Staff:
     def __init__(self, name):
         self.name = name
-        self.rec_msg()
-
-    def rec_msg(self):
         broadcast_service.listen('meeting', self.go_back)
 
     def go_back(self, info):
         print("[{2}] {0}(staff) receive msg '{1}' and go back now.".format(
             self.name, info, print_time()))
-        time.sleep(random.randint(1, 5))
+        time.sleep(2)
         print('[{1}] {0}(staff) is back now.'.format(self.name, print_time()))
 
 
 def main():
+    broadcast_service.enable_async = False
     app = Application()
     app.run()
 

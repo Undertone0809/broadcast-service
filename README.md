@@ -25,6 +25,10 @@
 - A publishing subscriber pattern can be built with a very simple syntax
 - Support different application scenarios, such as asynchronous and synchronous
 - Provide different syntax writing modes for lambda, callback functions, decorators, etc
+- A callback function listens on multiple subscriptions
+
+## Quick Start
+- [document](https://undertone0809.github.io/broadcast-service/#/)
 
 ## Setup
 ```sh
@@ -92,7 +96,7 @@ if __name__ == '__main__':
 
 You can use decorator to subscirbe your
 
-Actually, you can see more example in [example](/example) and [tests](/tests).
+Moreover, you can see more example in [document](https://undertone0809.github.io/broadcast-service/#/).
 
 ## TODO
 - optimize documents and show more examples.

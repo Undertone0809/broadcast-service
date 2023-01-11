@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from concurrent.futures import ThreadPoolExecutor
-from functools import wraps
 from typing import Optional, List, Callable
 
 __all__ = ['broadcast_service', 'BroadcastService']
@@ -61,28 +60,60 @@ class BroadcastService:
 
         # function renaming
         self.subscribe = self.listen
+        self.subscribe_all = self.listen_all
         self.publish = self.broadcast
         self.unsubscribe = self.stop_listen
 
         self.on = self.listen
+        self.on_all = self.listen_all
         self.emit = self.broadcast
         self.off = self.stop_listen
 
-    def listen(self, topic_name: str, callback: Callable):
-        """ listen topic """
-        if topic_name not in self.pubsub_channels.keys():
-            self.pubsub_channels[topic_name] = []
+    def listen(self, topics: str or List[str], callback: Callable):
+        """
+        listen topic.
+        """
+        if type(topics) == str:
+            self._listen_topic(topics, callback)
+        elif type(topics) == list:
+            for topic in topics:
+                self._listen_topic(topic, callback)
+        else:
+            raise ValueError("Unknown broadcast-service error, please submit "
+                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
 
-        if callback not in self.pubsub_channels[topic_name]:
-            # options = {
-            #     'callback_function': callback,
-            # }
-            self.pubsub_channels[topic_name].append(callback)
+    def listen_all(self, callback: Callable):
+        self._listen_topic('__all__', callback)
 
     def broadcast(self, topic_name: str, *args, **kwargs):
         """
         Launch broadcast on the specify topic
         """
+        if topic_name not in self.pubsub_channels.keys():
+            self.pubsub_channels[topic_name] = []
+
+        for item in self.pubsub_channels[topic_name]:
+            if self.enable_async:
+                self.thread_pool.submit(
+                    item, *args, **kwargs)
+            else:
+                item(*args, **kwargs)
+
+        for item in self.pubsub_channels['__all__']:
+            if self.enable_async:
+                self.thread_pool.submit(
+                    item, *args, **kwargs)
+            else:
+                item(*args, **kwargs)
+
+    def _listen_topic(self, topic_name: str, callback: Callable):
+        if topic_name not in self.pubsub_channels.keys():
+            self.pubsub_channels[topic_name] = []
+
+        if callback not in self.pubsub_channels[topic_name]:
+            self.pubsub_channels[topic_name].append(callback)
+
+    def _broadcast_topic(self, topic_name: str, *args, **kwargs):
         if topic_name not in self.pubsub_channels.keys():
             self.pubsub_channels[topic_name] = []
 

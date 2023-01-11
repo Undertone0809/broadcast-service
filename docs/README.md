@@ -25,6 +25,7 @@
 - A publishing subscriber pattern can be built with a very simple syntax
 - Support different application scenarios, such as asynchronous and synchronous
 - Provide different syntax writing modes for lambda, callback functions, decorators, etc
+- A callback function listens on multiple subscriptions
 
 ## Setup
 ```sh
@@ -58,41 +59,7 @@ if __name__ == '__main__':
 
 ```
 
-- You can use `publish, emit, broadcast` to send your topic msg and use `listen, on, subscribe` to listen your topic msg.
-
-- You can also add more arguments or no argument when you publish thr broadcast.
-```python
-from broadcast_service import broadcast_service
-
-# subscribe topic
-@broadcast_service.on_listen(['my_topic'])
-def handle_msg(info, info2):
-    print(info)
-    print(info2)
-
-if __name__ == '__main__':
-    info = 'This is very important msg'
-    info2 = 'This is also a very important msg.'
-
-    # publish broadcast
-    broadcast_service.publish('my_topic', info, info2)
-```
-```python
-from broadcast_service import broadcast_service
-
-# subscribe topic
-@broadcast_service.on_listen(['my_topic'])
-def handle_msg():
-    print('handle_msg callback')
-
-if __name__ == '__main__':
-    # publish broadcast
-    broadcast_service.publish('Test')
-```
-
-You can use decorator to subscirbe your
-
-Actually, you can see more example in [example](/example) and [tests](/tests).
+**About more example, please see [Quick Start](/quickstart.md)**
 
 ## TODO
 - optimize documents and show more examples.

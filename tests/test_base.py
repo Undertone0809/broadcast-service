@@ -40,8 +40,6 @@ class TestBroadcast(TestCase):
             self.test_listen_of_common_specify_params = True
 
         def handle_multi_topics(*args, **kwargs):
-            print('here')
-            print(args)
             self.counter += 1
             if args[0] == 111:
                 self.test_listen_multi_topic1_of_common = True
@@ -82,14 +80,25 @@ class TestBroadcast(TestCase):
         self.assertEqual(4, self.all_counter)
 
     def test_listen_of_decorator(self):
-        self.test_listen_of_decorator_no_params = False
+        self.test_listen_of_decorator_no_params1 = False
+        self.test_listen_of_decorator_no_params2 = False
+        self.test_listen_of_decorator_multi_params = False
         self.test_listen_of_decorator_specify_params = False
         self.test_listen_of_decorator_listen_all = False
         self.counter = 0
 
-        @broadcast_service.on_listen(["test_listen_of_decorator_no_params"])
+        @broadcast_service.on_listen("test_listen_of_decorator_no_params1")
         def handle_topic_no_params():
-            self.test_listen_of_decorator_no_params = True
+            self.test_listen_of_decorator_no_params1 = True
+        
+        @broadcast_service.on_listen(["test_listen_of_decorator_no_params2"])
+        def handle_topic_no_params():
+            self.test_listen_of_decorator_no_params2 = True
+
+        @broadcast_service.on_listen(["test_listen_of_decorator_no_params1","test_listen_of_decorator_no_params2"])
+        def handle_topic_no_params():
+            if self.test_listen_of_decorator_no_params1 and self.test_listen_of_decorator_no_params2:
+                self.test_listen_of_decorator_multi_params = True
 
         @broadcast_service.on_listen(["test_listen_of_decorator_specify_params"])
         def handle_topic_specify_params(a, b, c):
@@ -103,9 +112,16 @@ class TestBroadcast(TestCase):
             self.counter += 1
             self.test_listen_of_decorator_listen_all = True
 
-        broadcast_service.publish("test_listen_of_decorator_no_params")
+        broadcast_service.publish("test_listen_of_decorator_no_params1")
         wait()
-        self.assertTrue(self.test_listen_of_decorator_no_params)
+        self.assertTrue(self.test_listen_of_decorator_no_params1)
+
+        broadcast_service.publish("test_listen_of_decorator_no_params2")
+        wait()
+        self.assertTrue(self.test_listen_of_decorator_no_params2)
+
+        wait()
+        self.assertTrue(self.test_listen_of_decorator_multi_params)
 
         broadcast_service.publish(
             "test_listen_of_decorator_specify_params", 11, 22, 33)
@@ -115,7 +131,7 @@ class TestBroadcast(TestCase):
         broadcast_service.publish("test_listen_of_decorator_listen_all")
         wait()
         self.assertTrue(self.test_listen_of_decorator_listen_all)
-        self.assertEqual(3, self.counter)
+        self.assertEqual(4, self.counter)
 
     def test_listen_of_lambda(self):
         self.test_listen_of_lambda_no_params = False
@@ -140,7 +156,44 @@ class TestBroadcast(TestCase):
         self.assertTrue(self.test_listen_of_lambda_no_params)
 
     def test_broadcast(self):
-        pass
+        self.test_broadcast_one_topic1 = False
+        self.test_broadcast_one_topic2 = False
+        self.test_broadcast_multi_topic1 = False
+        self.test_broadcast_multi_topic2 = False
+        self.counter = 0
 
-    def test_close(self):
-        pass
+        @broadcast_service.on_listen("test_broadcast_one_topic1")
+        def handle_one_topic1():
+            self.counter += 1
+            self.test_broadcast_one_topic1 = True
+
+        @broadcast_service.on_listen("test_broadcast_one_topic2")
+        def handle_one_topic2():
+            self.counter += 1
+            self.test_broadcast_one_topic2 = True
+
+        @broadcast_service.on_listen("test_broadcast_multi_topic1")
+        def handle_multi_topic1():
+            self.counter += 1
+            self.test_broadcast_multi_topic1 = True
+
+        @broadcast_service.on_listen("test_broadcast_multi_topic2")
+        def handle_multi_topic2():
+            self.counter += 1
+            self.test_broadcast_multi_topic2 = True
+
+        broadcast_service.publish("test_broadcast_one_topic1")
+        wait()
+        self.assertTrue(self.test_broadcast_one_topic1)
+
+        broadcast_service.publish(["test_broadcast_one_topic2"])
+        wait()
+        self.assertTrue(self.test_broadcast_one_topic2)
+
+        broadcast_service.publish(["test_broadcast_multi_topic1", "test_broadcast_multi_topic2"])
+        wait()
+        self.assertTrue(self.test_broadcast_multi_topic1 and self.test_broadcast_multi_topic2)
+
+        broadcast_service.publish_all()
+        wait()
+        self.assertEqual(8, self.counter)

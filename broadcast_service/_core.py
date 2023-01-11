@@ -60,14 +60,14 @@ class BroadcastService:
 
         # function renaming
         self.subscribe = self.listen
-        self.subscribe_all = self.listen_all
-        self.publish = self.broadcast
-        self.unsubscribe = self.stop_listen
-
         self.on = self.listen
-        self.on_all = self.listen_all
+        self.publish = self.broadcast
         self.emit = self.broadcast
+        self.unsubscribe = self.stop_listen
         self.off = self.stop_listen
+        self.on_subscribe = self.on_listen
+        self.subscribe_all = self.listen_all
+        self.publish_all = self.broadcast_all
 
     def listen(self, topics: str or List[str], callback: Callable):
         """
@@ -83,28 +83,33 @@ class BroadcastService:
                              "issue to https://github.com/Undertone0809/broadcast-service/issues")
 
     def listen_all(self, callback: Callable):
+        """
+        '__all__' is a special topic. It can receive any topic message.
+        """
         self._listen_topic('__all__', callback)
 
-    def broadcast(self, topic_name: str, *args, **kwargs):
+    def broadcast(self, topics: str or List[str], *args, **kwargs):
         """
         Launch broadcast on the specify topic
         """
-        if topic_name not in self.pubsub_channels.keys():
-            self.pubsub_channels[topic_name] = []
+        if type(topics) == str:
+            self._broadcast_topic(topics, *args, **kwargs)
+        elif type(topics) == list:
+            for topic in topics:
+                self._broadcast_topic(topic, *args, **kwargs)
+        else:
+            raise ValueError("Unknown broadcast-service error, please submit "
+                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
 
-        for item in self.pubsub_channels[topic_name]:
-            if self.enable_async:
-                self.thread_pool.submit(
-                    item, *args, **kwargs)
-            else:
-                item(*args, **kwargs)
-
-        for item in self.pubsub_channels['__all__']:
-            if self.enable_async:
-                self.thread_pool.submit(
-                    item, *args, **kwargs)
-            else:
-                item(*args, **kwargs)
+    def broadcast_all(self, *args, **kwargs):
+        """
+        All topics listened on will be called back.
+        Attention: Not all callback function will called. If your publish
+         and your subscribe takes different arguments, your callback function
+         will not be executed.
+        """
+        for topic in self.pubsub_channels.keys():
+            self._broadcast_topic(topic, *args, **kwargs)
 
     def _listen_topic(self, topic_name: str, callback: Callable):
         if topic_name not in self.pubsub_channels.keys():
@@ -114,6 +119,10 @@ class BroadcastService:
             self.pubsub_channels[topic_name].append(callback)
 
     def _broadcast_topic(self, topic_name: str, *args, **kwargs):
+        """
+        broadcast single topic.
+        TODO fix problem: There is no guarantee that every callback function will be executed unnecessarily in some cases.
+        """
         if topic_name not in self.pubsub_channels.keys():
             self.pubsub_channels[topic_name] = []
 
@@ -139,12 +148,16 @@ class BroadcastService:
         else:
             self.pubsub_channels[topic_name].remove(callback)
 
-    def on_listen(self, topics: Optional[List[str]] = None) -> Callable:
+    def on_listen(self, topics: str or Optional[List[str]] = None) -> Callable:
         """
         Decorator to listen specify topic. If topics is none, then listen all topics has exits.
         :param topics: topic list, you can input topic like: ["topic1", "topic2"].
 
         Usage::
+            @broadcast_service.on_listen('topic1')
+            def handle_all_msg():
+                # your code
+
             @broadcast_service.on_listen(['topic1'])
             def handle_all_msg():
                 # your code
@@ -161,11 +174,12 @@ class BroadcastService:
         the callback function you handle should take arguments, otherwise it will not be called back.
         """
         def decorator(fn: Callable) -> Callable:
-            if topics is not None:
-                for topic in topics:
-                    self.listen(topic, fn)
-            else:
-                self.listen('__all__', fn)
+            if not topics:
+                self._listen_topic('__all__', fn)
+            elif type(topics) == str:
+                self._listen_topic(topics, fn)
+            elif type(topics) == list:
+                self.listen(topics, fn)
 
             def inner(*args, **kwargs) -> Callable:
                 ret = fn(*args, **kwargs)

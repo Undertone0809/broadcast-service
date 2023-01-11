@@ -1,5 +1,5 @@
 - Introduction
-  - [broadcast-service](broadcast-service.md)
+  - [broadcast-service](README.md)
 
 - Getting started
 
@@ -8,5 +8,6 @@
 
 - Other
   
+  - [Update](update.md)
   - [Plan](plan.md)
   - [Contribution](contribution.md)

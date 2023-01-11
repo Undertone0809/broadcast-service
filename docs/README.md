@@ -38,15 +38,16 @@ There is a easy demo to show how to use broadcast-service.
 ```python
 from broadcast_service import broadcast_service
 
+
 # callback of common method
 def handle_msg(params):
-    print(params)
+    print(f"handle_msg receive params: {params}")
 
 
 # callback of decorator
 @broadcast_service.on_listen(['my_topic'])
 def handle_decorator_msg(params):
-    print(params)
+    print(f"handle_decorator_msg receive params: {params}")
 
 if __name__ == '__main__':
     info = 'This is very important msg'
@@ -56,7 +57,6 @@ if __name__ == '__main__':
 
     # publish broadcast
     broadcast_service.publish('my_topic', info)
-
 ```
 
 **About more example, please see [Quick Start](/quickstart.md)**

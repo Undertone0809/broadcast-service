@@ -25,4 +25,4 @@
 - Provide different syntax writing modes for lambda, callback functions, decorators, etc
 
 [GitHub](https://github.com/Undertone0809/broadcast-service)
-[Getting Started](/broadcast-service.md)
+[Getting Started](/README.md)

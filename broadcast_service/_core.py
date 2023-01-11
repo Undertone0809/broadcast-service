@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from concurrent.futures import ThreadPoolExecutor
-from functools import wraps
 from typing import Optional, List, Callable
 
 __all__ = ['broadcast_service', 'BroadcastService']
@@ -61,27 +60,68 @@ class BroadcastService:
 
         # function renaming
         self.subscribe = self.listen
-        self.publish = self.broadcast
-        self.unsubscribe = self.stop_listen
-
         self.on = self.listen
+        self.publish = self.broadcast
         self.emit = self.broadcast
+        self.unsubscribe = self.stop_listen
         self.off = self.stop_listen
+        self.on_subscribe = self.on_listen
+        self.subscribe_all = self.listen_all
+        self.publish_all = self.broadcast_all
 
-    def listen(self, topic_name: str, callback: Callable):
-        """ listen topic """
+    def listen(self, topics: str or List[str], callback: Callable):
+        """
+        listen topic.
+        """
+        if type(topics) == str:
+            self._listen_topic(topics, callback)
+        elif type(topics) == list:
+            for topic in topics:
+                self._listen_topic(topic, callback)
+        else:
+            raise ValueError("Unknown broadcast-service error, please submit "
+                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
+
+    def listen_all(self, callback: Callable):
+        """
+        '__all__' is a special topic. It can receive any topic message.
+        """
+        self._listen_topic('__all__', callback)
+
+    def broadcast(self, topics: str or List[str], *args, **kwargs):
+        """
+        Launch broadcast on the specify topic
+        """
+        if type(topics) == str:
+            self._broadcast_topic(topics, *args, **kwargs)
+        elif type(topics) == list:
+            for topic in topics:
+                self._broadcast_topic(topic, *args, **kwargs)
+        else:
+            raise ValueError("Unknown broadcast-service error, please submit "
+                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
+
+    def broadcast_all(self, *args, **kwargs):
+        """
+        All topics listened on will be called back.
+        Attention: Not all callback function will called. If your publish
+         and your subscribe takes different arguments, your callback function
+         will not be executed.
+        """
+        for topic in self.pubsub_channels.keys():
+            self._broadcast_topic(topic, *args, **kwargs)
+
+    def _listen_topic(self, topic_name: str, callback: Callable):
         if topic_name not in self.pubsub_channels.keys():
             self.pubsub_channels[topic_name] = []
 
         if callback not in self.pubsub_channels[topic_name]:
-            # options = {
-            #     'callback_function': callback,
-            # }
             self.pubsub_channels[topic_name].append(callback)
 
-    def broadcast(self, topic_name: str, *args, **kwargs):
+    def _broadcast_topic(self, topic_name: str, *args, **kwargs):
         """
-        Launch broadcast on the specify topic
+        broadcast single topic.
+        TODO fix problem: There is no guarantee that every callback function will be executed unnecessarily in some cases.
         """
         if topic_name not in self.pubsub_channels.keys():
             self.pubsub_channels[topic_name] = []
@@ -108,12 +148,16 @@ class BroadcastService:
         else:
             self.pubsub_channels[topic_name].remove(callback)
 
-    def on_listen(self, topics: Optional[List[str]] = None) -> Callable:
+    def on_listen(self, topics: str or Optional[List[str]] = None) -> Callable:
         """
         Decorator to listen specify topic. If topics is none, then listen all topics has exits.
         :param topics: topic list, you can input topic like: ["topic1", "topic2"].
 
         Usage::
+            @broadcast_service.on_listen('topic1')
+            def handle_all_msg():
+                # your code
+
             @broadcast_service.on_listen(['topic1'])
             def handle_all_msg():
                 # your code
@@ -130,11 +174,12 @@ class BroadcastService:
         the callback function you handle should take arguments, otherwise it will not be called back.
         """
         def decorator(fn: Callable) -> Callable:
-            if topics is not None:
-                for topic in topics:
-                    self.listen(topic, fn)
-            else:
-                self.listen('__all__', fn)
+            if not topics:
+                self._listen_topic('__all__', fn)
+            elif type(topics) == str:
+                self._listen_topic(topics, fn)
+            elif type(topics) == list:
+                self.listen(topics, fn)
 
             def inner(*args, **kwargs) -> Callable:
                 ret = fn(*args, **kwargs)

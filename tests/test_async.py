@@ -18,7 +18,7 @@ from broadcast_service import broadcast_service
 
 
 def handle():
-    time.sleep(2)
+    time.sleep(1)
 
 
 class TestAsync(unittest.TestCase):
@@ -28,7 +28,7 @@ class TestAsync(unittest.TestCase):
         broadcast_service.listen("test_topic", handle)
         broadcast_service.broadcast("test_topic")
         used_time = time.time() - start_time
-        self.assertLessEqual(used_time, 2)
+        self.assertLessEqual(used_time, 1)
 
     def test_sync(self):
         start_time = time.time()
@@ -36,7 +36,7 @@ class TestAsync(unittest.TestCase):
         broadcast_service.listen("test_topic", handle)
         broadcast_service.broadcast("test_topic")
         used_time = time.time() - start_time
-        self.assertEqual(int(used_time), 2)
+        self.assertEqual(int(used_time), 1)
 
 
 if __name__ == '__main__':

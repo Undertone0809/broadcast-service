@@ -28,7 +28,9 @@
 - A callback function listens on multiple subscriptions
 
 ## Quick Start
-- [document](https://undertone0809.github.io/broadcast-service/#/)
+- [document github-pages](https://undertone0809.github.io/broadcast-service/#/)
+- [document gitee-pages](https://zeeland.gitee.io/broadcast-service/#/)
+- [https://pypi.org/project/broadcast-service/](https://pypi.org/project/broadcast-service/)
 
 ## Setup
 ```sh

@@ -23,7 +23,7 @@ setuptools.setup(
     version="1.2.0",
     author="Zeeland",
     author_email="zeeland@foxmail.com",
-    description="A lightweight third-party broadcast library",
+    description="A lightweight third-party broadcast/pubsub library",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Undertone0809/broadcast-service",

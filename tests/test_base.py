@@ -14,7 +14,9 @@
 
 import time
 from unittest import TestCase
-from broadcast_service import broadcast_service
+from broadcast_service import broadcast_service, enable_log
+
+enable_log()
 
 
 def wait(seconds=0.1):
@@ -90,12 +92,12 @@ class TestBroadcast(TestCase):
         @broadcast_service.on_listen("test_listen_of_decorator_no_params1")
         def handle_topic_no_params():
             self.test_listen_of_decorator_no_params1 = True
-        
+
         @broadcast_service.on_listen(["test_listen_of_decorator_no_params2"])
         def handle_topic_no_params():
             self.test_listen_of_decorator_no_params2 = True
 
-        @broadcast_service.on_listen(["test_listen_of_decorator_no_params1","test_listen_of_decorator_no_params2"])
+        @broadcast_service.on_listen(["test_listen_of_decorator_no_params1", "test_listen_of_decorator_no_params2"])
         def handle_topic_no_params():
             if self.test_listen_of_decorator_no_params1 and self.test_listen_of_decorator_no_params2:
                 self.test_listen_of_decorator_multi_params = True

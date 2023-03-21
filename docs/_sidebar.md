@@ -5,6 +5,7 @@
 
   - [Quick Start](quickstart.md)
   - [Async](async.md)
+  - [Log](log.md)
 
 - Other
   

@@ -16,7 +16,6 @@ This example show how to use in a class. The ueage is very
 similar to the common method.
 """
 
-
 from broadcast_service import broadcast_service
 
 

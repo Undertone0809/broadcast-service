@@ -12,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from concurrent.futures import ThreadPoolExecutor
+import logging
 from typing import Optional, List, Callable
+from concurrent.futures import ThreadPoolExecutor
 
-__all__ = ['broadcast_service', 'BroadcastService']
+__all__ = ['broadcast_service', 'BroadcastService', 'enable_log']
+
+
+def enable_log():
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class BroadcastService:
@@ -57,6 +62,7 @@ class BroadcastService:
         }
         self.enable_async: bool = True
         self.thread_pool = ThreadPoolExecutor(max_workers=5)
+        self.logger = logging.getLogger(__name__)
 
         # function renaming
         self.subscribe = self.listen
@@ -71,13 +77,13 @@ class BroadcastService:
 
     def listen(self, topics: str or List[str], callback: Callable):
         """
-        listen topic.
+        listen topics.
         """
         if type(topics) == str:
-            self._listen_topic(topics, callback)
+            self._invoke_listen_topic(topics, callback)
         elif type(topics) == list:
             for topic in topics:
-                self._listen_topic(topic, callback)
+                self._invoke_listen_topic(topic, callback)
         else:
             raise ValueError("Unknown broadcast-service error, please submit "
                              "issue to https://github.com/Undertone0809/broadcast-service/issues")
@@ -86,17 +92,18 @@ class BroadcastService:
         """
         '__all__' is a special topic. It can receive any topic message.
         """
-        self._listen_topic('__all__', callback)
+        self._invoke_listen_topic('__all__', callback)
 
     def broadcast(self, topics: str or List[str], *args, **kwargs):
         """
         Launch broadcast on the specify topic
         """
+        self.logger.debug(f"[broadcast-service] broadcast topic <{topics}>")
         if type(topics) == str:
-            self._broadcast_topic(topics, *args, **kwargs)
+            self._invoke_broadcast_topic(topics, *args, **kwargs)
         elif type(topics) == list:
             for topic in topics:
-                self._broadcast_topic(topic, *args, **kwargs)
+                self._invoke_broadcast_topic(topic, *args, **kwargs)
         else:
             raise ValueError("Unknown broadcast-service error, please submit "
                              "issue to https://github.com/Undertone0809/broadcast-service/issues")
@@ -109,16 +116,16 @@ class BroadcastService:
          will not be executed.
         """
         for topic in self.pubsub_channels.keys():
-            self._broadcast_topic(topic, *args, **kwargs)
+            self._invoke_broadcast_topic(topic, *args, **kwargs)
 
-    def _listen_topic(self, topic_name: str, callback: Callable):
+    def _invoke_listen_topic(self, topic_name: str, callback: Callable):
         if topic_name not in self.pubsub_channels.keys():
             self.pubsub_channels[topic_name] = []
 
         if callback not in self.pubsub_channels[topic_name]:
             self.pubsub_channels[topic_name].append(callback)
 
-    def _broadcast_topic(self, topic_name: str, *args, **kwargs):
+    def _invoke_broadcast_topic(self, topic_name: str, *args, **kwargs):
         """
         broadcast single topic.
         TODO fix problem: There is no guarantee that every callback function will be executed unnecessarily in some cases.
@@ -173,18 +180,20 @@ class BroadcastService:
         Attention: Your params should keep '*args, **kwargs'. If you publish a topic take arguments,
         the callback function you handle should take arguments, otherwise it will not be called back.
         """
+
         def decorator(fn: Callable) -> Callable:
+            self.logger.debug(f"[broadcast-service] <{fn.__name__}> listen <{topics}> topic")
             if not topics:
-                self._listen_topic('__all__', fn)
-            elif type(topics) == str:
-                self._listen_topic(topics, fn)
-            elif type(topics) == list:
+                self.listen_all(fn)
+            elif type(topics) == str or list:
                 self.listen(topics, fn)
 
             def inner(*args, **kwargs) -> Callable:
                 ret = fn(*args, **kwargs)
                 return ret
+
             return inner
+
         return decorator
 
 

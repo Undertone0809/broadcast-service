@@ -7,6 +7,14 @@ Please update the latest version. The old version is shit.
 pip install --upgrade broadcast-service
 ```
 
+## v1.3.0 2023-03-21
+
+#### feat
+1. Add log mode. [Detail Information](./log.md)
+
+#### fix
+1. optimize some code structure
+
 ## v1.2.0 2023-01-12
 
 #### feat

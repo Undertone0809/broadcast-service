@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from broadcast_service import broadcast_service, BroadcastService
+from broadcast_service import broadcast_service, BroadcastService, enable_log
+
+enable_log()
 
 
 def handle_no_msg():
@@ -53,7 +55,7 @@ def callback_of_lambda():
     callback of lambda
     """
     # listen topic
-    broadcast_service.listen('lambda', lambda x,y: print(f"the params is {x} and {y}"))
+    broadcast_service.listen('lambda', lambda x, y: print(f"the params is {x} and {y}"))
 
     # publish broadcast
     broadcast_service.broadcast('lambda', 11, 22)

@@ -1,6 +1,6 @@
 <!-- _coverpage.md -->
 
-# broadcast-service <small>1.1.7</small>
+# broadcast-service <small>1.2.0</small>
 
 > A lightweight python broadcast library. You can easily construct a Broadcast pattern/Publish subscriber pattern through this library.
 

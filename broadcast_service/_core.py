@@ -15,6 +15,7 @@
 import logging
 from typing import Optional, List, Callable
 from concurrent.futures import ThreadPoolExecutor
+from broadcast_service.singleton import Singleton
 
 __all__ = ['broadcast_service', 'BroadcastService', 'enable_log']
 
@@ -23,7 +24,7 @@ def enable_log():
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class BroadcastService:
+class BroadcastService(metaclass=Singleton):
     """
     This class implements broadcast mode, you can import the instance by single class.
     By BroadcastService, you can send topic message,it will automatically execute the

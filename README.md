@@ -26,6 +26,7 @@
 - Support different application scenarios, such as asynchronous and synchronous
 - Provide different syntax writing modes for lambda, callback functions, decorators, etc
 - A callback function listens on multiple subscriptions
+- Provide publisher dispatch callback manage
 
 ## Quick Start
 - [document github-pages](https://undertone0809.github.io/broadcast-service/#/)
@@ -44,12 +45,6 @@ There is an easy demo to show how to use broadcast-service.
 ```python
 from broadcast_service import broadcast_service
 
-
-# callback of common method
-def handle_msg(params):
-    print(f"handle_msg receive params: {params}")
-
-
 # callback of decorator
 @broadcast_service.on_listen('my_topic')
 def handle_decorator_msg(params):
@@ -57,9 +52,6 @@ def handle_decorator_msg(params):
 
 if __name__ == '__main__':
     info = 'This is very important msg'
-
-    # subscribe topic
-    broadcast_service.subscribe('my_topic', handle_msg)
 
     # publish broadcast
     broadcast_service.publish('my_topic', info)
@@ -98,7 +90,30 @@ if __name__ == '__main__':
     broadcast_service.publish('Test')
 ```
 
-You can use decorator to subscirbe your
+You can use `config` to make publisher callback If you want.
+
+```python
+from broadcast_service import broadcast_service
+
+
+@broadcast_service.on_listen("topic")
+def handle_subscriber_callback():
+    print("handle_subscriber_callback")
+
+
+def handle_publisher_callback(*args):
+    print("handle_publisher_callback")
+
+
+if __name__ == '__main__':
+    broadcast_service.config(
+        num_of_executions=5,
+        callback=handle_publisher_callback,
+        enable_final_return=True,
+        interval=0.1
+    ).publish("topic")
+
+```
 
 Moreover, you can see more example in [document](https://undertone0809.github.io/broadcast-service/#/).
 
@@ -107,7 +122,7 @@ Moreover, you can see more example in [document](https://undertone0809.github.io
 - ~~optimize the syntax expression of broadcast-service~~
 - provide more test cases
 - provide the ability to subscribe the topic and callback once
-- Support for fuzzy subscriptions
+- support for fuzzy subscriptions
 - ~~the publisher of the topic can provide a return value~~
 - optimize usage in class ('self' params problem)
 - build observer mode

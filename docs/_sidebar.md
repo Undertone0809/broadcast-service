@@ -4,6 +4,7 @@
 - Getting started
 
   - [Quick Start](quickstart.md)
+  - [Publisher Dispatch](publisher_dispatch.md)
   - [Async](async.md)
   - [Log](log.md)
 

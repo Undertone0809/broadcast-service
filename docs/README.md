@@ -64,9 +64,13 @@ if __name__ == '__main__':
 ## TODO
 - optimize documents and show more examples.
 - ~~optimize the syntax expression of broadcast-service~~
-- provide more test cases
-- privide the ability to subscribe the topic and callback once
-- Support for fuzzy subscriptions
+- provide more test cases (developing)
+- provide the ability to subscribe the topic and callback once
+- support for fuzzy subscriptions
+- ~~the publisher of the topic can provide a return value~~
+- optimize usage in class ('self' params problem)
+- build observer mode
+- ~~provide publisher callback when all subscriber have completed callback~~
 
 
 ## Contribution

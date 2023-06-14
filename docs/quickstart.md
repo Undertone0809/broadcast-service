@@ -14,7 +14,7 @@ pip install --upgrade broadcast-service
     <img src="https://zeeland-bucket.oss-cn-beijing.aliyuncs.com/typora_img/20230111230418.png"/>
 </p>
 
-**Now you can see a easy pubsub pattern.**
+**Now you can see an easy pubsub pattern.**
 ```python
 from broadcast_service import broadcast_service
 
@@ -40,15 +40,12 @@ if __name__ == '__main__':
 ## How to subscribe?
 Actually, `broadcast-service` support mutiple subscirbe and publish methods, such as `common callback function` and `decorator`. You can see more example as follows.
 
+> Decorator method is recommended.
+
 - **subscribe single topic**
 
 ```python
 from broadcast_service import broadcast_service
-
-
-# common callback function method
-def handle_msg(params):
-    print(params)
 
 
 # decorator method
@@ -66,10 +63,28 @@ def handle_decorator_msg2(params):
 if __name__ == '__main__':
     info = 'This is very important msg'
 
+    # publish broadcast
+    broadcast_service.publish('my_topic', info)
+```
+
+or
+
+```python
+from broadcast_service import broadcast_service
+
+
+# common callback function method
+def handle_msg(params):
+    print(params)
+
+
+if __name__ == '__main__':
+    info = 'This is very important msg'
+
     # subscribe topic
     broadcast_service.subscribe('my_topic', handle_msg)
     # you can also pass a topics list to subscribe multiple topics
-    broadcast_service.subscribe(['my_topic'], handle_msg)
+    # broadcast_service.subscribe(['my_topic'], handle_msg)
 
     # publish broadcast
     broadcast_service.publish('my_topic', info)
@@ -85,14 +100,26 @@ if __name__ == '__main__':
 from broadcast_service import broadcast_service
 
 
-def handle_msg(params):
-    print(params)
-
-
 @broadcast_service.on_listen(['my_topic1', 'my_topic2'])
 def handle_decorator_msg(params):
     print(params)
 
+
+if __name__ == '__main__':
+    # publish broadcast
+    broadcast_service.publish('my_topic1', "msg1")
+    broadcast_service.publish('my_topic2', "msg2")
+```
+
+or
+
+```python
+from broadcast_service import broadcast_service
+
+
+def handle_msg(params):
+    print(params)
+    
 
 if __name__ == '__main__':
     # This callback function is triggered when a message is sent from one of two topics subscribed to

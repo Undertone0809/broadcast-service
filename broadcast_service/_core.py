@@ -17,6 +17,7 @@
 # Project Link: https://github.com/Undertone0809/broadcast-service
 # Contact Email: zeeland@foxmail.com
 
+import time
 import logging
 from pydantic import BaseModel, validator
 from concurrent.futures import ThreadPoolExecutor
@@ -329,7 +330,7 @@ class BroadcastService(BaseBroadcastService):
         for i in range(self.cur_publisher_dispatch_config.get_num_of_executions()):
             super().broadcast(topics, *args, **kwargs)
             self.cur_publisher_dispatch_config.counter += 1
-            # time.sleep(0.01)
+            time.sleep(self.cur_publisher_dispatch_config.interval)
 
         self.enable_config = False
 

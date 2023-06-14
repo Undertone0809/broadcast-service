@@ -20,7 +20,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setuptools.setup(
     name="broadcast_service",
-    version="1.3.1",
+    version="2.0.0",
     author="Zeeland",
     author_email="zeeland@foxmail.com",
     description="A lightweight third-party broadcast/pubsub library",
@@ -28,6 +28,8 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Undertone0809/broadcast-service",
     packages=setuptools.find_packages(),
+    install_requires=['pydantic', 'cushy-storage'],
+    python_requires='>=3.6',
     license="Apache 2.0",
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -42,5 +44,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
 
     ],
-    keywords="broadcast, broadcast-service",
+    keywords="broadcast, broadcast-service, publisher, subscriber, pubsub",
 )

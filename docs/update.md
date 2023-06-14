@@ -6,6 +6,19 @@ Please update the latest version. The old version is shit.
 ```bash
 pip install --upgrade broadcast-service
 ```
+## v2.0.0 2023-06-14
+
+#### feat
+1. Add publisher dispatch config. It can publish topic with a complex mode.
+- provide publisher callback
+- provide the return value of subscriber callbacks
+- provide multiple call publish at once
+- provide multiple call time interval
+
+## v1.3.1 2023-06-02
+
+#### fix
+1. Add singleton to keep only one `broadcast_service` instance in an application [#11](https://github.com/Undertone0809/broadcast-service/pull/11)
 
 ## v1.3.0 2023-03-21
 

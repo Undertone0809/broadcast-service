@@ -33,13 +33,14 @@
 - [https://pypi.org/project/broadcast-service/](https://pypi.org/project/broadcast-service/)
 
 ## Setup
+
 ```sh
 pip install broadcast-service
 ```
 
-
 ## Usage
-There is a easy demo to show how to use broadcast-service.
+There is an easy demo to show how to use broadcast-service.
+
 ```python
 from broadcast_service import broadcast_service
 
@@ -50,7 +51,7 @@ def handle_msg(params):
 
 
 # callback of decorator
-@broadcast_service.on_listen(['my_topic'])
+@broadcast_service.on_listen('my_topic')
 def handle_decorator_msg(params):
     print(f"handle_decorator_msg receive params: {params}")
 
@@ -67,6 +68,7 @@ if __name__ == '__main__':
 - You can use `publish, emit, broadcast` to send your topic msg and use `listen, on, subscribe` to listen your topic msg.
 
 - You can also add more arguments or no argument when you publish thr broadcast.
+
 ```python
 from broadcast_service import broadcast_service
 
@@ -104,8 +106,12 @@ Moreover, you can see more example in [document](https://undertone0809.github.io
 - optimize documents and show more examples.
 - ~~optimize the syntax expression of broadcast-service~~
 - provide more test cases
-- privide the ability to subscribe the topic and callback once
+- provide the ability to subscribe the topic and callback once
 - Support for fuzzy subscriptions
+- ~~the publisher of the topic can provide a return value~~
+- optimize usage in class ('self' params problem)
+- build observer mode
+- ~~provide publisher callback when all subscriber have completed callback~~
 
 
 ## Contribution

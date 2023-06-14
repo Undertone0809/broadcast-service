@@ -14,9 +14,10 @@
 
 import time
 from unittest import TestCase
-from broadcast_service import broadcast_service, enable_log
+from broadcast_service import broadcast_service
+from broadcast_service.logger import get_logger, enable_log
 
-enable_log()
+logger = get_logger()
 
 
 def wait(seconds=0.1):
@@ -199,3 +200,15 @@ class TestBroadcast(TestCase):
         broadcast_service.publish_all()
         wait()
         self.assertEqual(8, self.counter)
+
+    def test_broadcast_multiple_call_one_topic(self):
+        self.counter = 0
+
+        @broadcast_service.on_listen("test_broadcast_multiple_call_one_topic")
+        def handle_multi_topic1():
+            self.counter += 1
+            self.test_broadcast_multi_topic1 = True
+
+        broadcast_service.config(num_of_executions=5).publish("test_broadcast_multiple_call_one_topic")
+        wait()
+        self.assertTrue(5, self.counter)

@@ -28,7 +28,7 @@ class TestAsync(unittest.TestCase):
         broadcast_service.listen("test_topic", handle)
         broadcast_service.broadcast("test_topic")
         used_time = time.time() - start_time
-        self.assertLessEqual(used_time, 1)
+        self.assertAlmostEqual(1, used_time, delta=0.1)
 
     def test_sync(self):
         start_time = time.time()

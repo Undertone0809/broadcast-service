@@ -17,4 +17,24 @@
 # Project Link: https://github.com/Undertone0809/broadcast-service
 # Contact Email: zeeland@foxmail.com
 
-from ._core import *
+from broadcast_service import broadcast_service
+
+
+@broadcast_service.on_listen("topic")
+def handle_subscriber_callback():
+    print("handle_subscriber_callback")
+    return {"key", "value"}
+
+
+def handle_publisher_callback(*args):
+    print(f"handle_publisher_callback {args}")
+
+
+def main():
+    broadcast_service.config(
+        callback=handle_publisher_callback,
+    ).publish("topic")
+
+
+if __name__ == '__main__':
+    main()

@@ -2,7 +2,7 @@
     broadcast-service
 </h1>
 <p align="center">
-  <strong>A lightweight python broadcast library. You can easily construct a Broadcast pattern/Publish subscriber pattern through this library.</strong>
+  <strong>A powerful python broadcast library. You can easily construct a Broadcast pattern/Publish subscriber pattern through this library.</strong>
 </p>
 
 <p align="center">

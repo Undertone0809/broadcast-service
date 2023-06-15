@@ -82,3 +82,17 @@ class TestPublisherCallback(TestCase):
         duration = time.time() - start_time
         self.assertAlmostEqual(1, duration, delta=0.1)
         self.assertEqual(5, self.counter)
+
+    def test_split_parameter(self):
+        self.counter = 1
+
+        @broadcast_service.on_listen("test_split_parameter")
+        def handle_subscriber_callback(**kwargs):
+            self.assertEqual(self.counter, kwargs['split_parameter'])
+            self.counter += 1
+
+        params = [1, 2, 3]
+        broadcast_service.config(
+            num_of_executions=3,
+            split_parameters=params
+        ).publish("test_split_parameter")

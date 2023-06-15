@@ -242,6 +242,10 @@ class PublisherDispatchConfig(BaseModel):
     enable_final_return: bool = False
     """This parameter indicates whether you want to call the publisher callback after calling the topic 
     n times, or call the publisher callback after each topic publishing."""
+    split_parameters: Optional[List[Any]] = None
+    """If you initiate multiple calls and want to pass different parameters to the subscriber in each 
+    call, you can use this parameter for parameter passing. Additionally, when you use this parameter, 
+    you do not need to pass any parameters in the broadcast() function."""
 
     @property
     def start_publisher_callback_or_not(self) -> bool:
@@ -300,6 +304,7 @@ class BroadcastService(BaseBroadcastService):
             callback: Optional[Callable] = None,
             enable_final_return: bool = False,
             interval: float = 0,
+            split_parameters: Optional[List[Any]] = None
     ) -> 'BroadcastService':
         """Provide more complex topic publish mode
 
@@ -310,6 +315,9 @@ class BroadcastService(BaseBroadcastService):
             enable_final_return: default is False, it means you can get callback after you publish
                 n times topic. In this case, finish_callback params is store in *args rather than **kwargs.
             interval: publish interval. Unit seconds.
+            split_parameters: If you initiate multiple calls and want to pass different parameters to the subscriber
+                in each call, you can use this parameter for parameter passing. Additionally, when you use this
+                parameter, you do not need to pass any parameters in the broadcast() function.
         Returns:
             Returns current object, which is used to call broadcast with configuration.
         """
@@ -319,7 +327,8 @@ class BroadcastService(BaseBroadcastService):
             callback=callback,
             enable_final_return=enable_final_return,
             interval=interval,
-            status=PUBLISHER_CALLBACK_STATUS['RUNNING']
+            status=PUBLISHER_CALLBACK_STATUS['RUNNING'],
+            split_parameters=split_parameters
         )
         return self
 
@@ -328,6 +337,10 @@ class BroadcastService(BaseBroadcastService):
             self.cur_publisher_dispatch_config = self.publish_dispatch_config_manager.get_latest_publisher_callback()
 
         for i in range(self.cur_publisher_dispatch_config.get_num_of_executions()):
+            if self.cur_publisher_dispatch_config.split_parameters:
+                kwargs.update(
+                    {"split_parameter": self.cur_publisher_dispatch_config.split_parameters[i]}
+                )
             super().broadcast(topics, *args, **kwargs)
             self.cur_publisher_dispatch_config.counter += 1
             time.sleep(self.cur_publisher_dispatch_config.interval)

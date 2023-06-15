@@ -6,10 +6,15 @@ Please update the latest version. The old version is shit.
 ```bash
 pip install --upgrade broadcast-service
 ```
+## v2.1.0 2023-06-15
+
+#### feat
+1. Add split_parameters for config(). [#docs](publisher_dispatch?id=passing-different-parameters-when-publishing-a-topic-multiple-times)
+
 ## v2.0.0 2023-06-14
 
 #### feat
-1. Add publisher dispatch config. It can publish topic with a complex mode.
+1. Add publisher dispatch config. It can publish topic with a complex mode. [#12](https://github.com/Undertone0809/broadcast-service/pull/12)
 - provide publisher callback
 - provide the return value of subscriber callbacks
 - provide multiple call publish at once

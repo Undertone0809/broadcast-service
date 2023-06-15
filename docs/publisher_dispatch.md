@@ -232,3 +232,47 @@ if __name__ == '__main__':
 ```
 
 It should be noted that the order of the three elements `args[0]`, `args[1]`, and `args[2]` in the above example is not uniquely determined, which depends on the execution time of the subscriber's callback function. However, in most cases, we cannot judge which subscriber callback function ends first, so `broadcast-service` development specifications recommend that when using this function, let the return value types of the subscriber callback functions be consistent as much as possible to reduce the cost of additional data judgment.
+
+## Passing different parameters when publishing a topic multiple times
+
+If you want to pass different parameters when publishing a topic multiple times. The following example show how to do.
+
+```python
+from broadcast_service import broadcast_service
+
+
+@broadcast_service.on_listen("test_split_parameter")
+def query_from_google(**kwargs):
+    print(kwargs['split_parameter'])
+
+
+keywords = ["What is NLP?", "Apple", "Tomorrow temperature"]
+broadcast_service.config(
+    num_of_executions=3,
+    split_parameters=keywords
+).publish("test_split_parameter")
+```
+
+For stability, we provide a specification. You must use `**kwargs`, `kwargs['split_parameter']` to receive parameters.
+
+**output**
+```text
+What is NLP?
+Apple
+Tomorrow temperature
+```
+
+The above example and the following notation are equivalent.
+
+```python
+from broadcast_service import broadcast_service
+
+@broadcast_service.on_listen("test_split_parameter")
+def query_from_google(**kwargs):
+    print(kwargs['split_parameter'])
+
+keywords = ["What is NLP?", "Apple", "Tomorrow temperature"]
+broadcast_service.publish("test_split_parameter", {"split_parameter": keywords[0]})
+broadcast_service.publish("test_split_parameter", {"split_parameter": keywords[1]})
+broadcast_service.publish("test_split_parameter", {"split_parameter": keywords[2]})
+```

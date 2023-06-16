@@ -258,9 +258,21 @@ class PublisherDispatchConfig(BaseModel):
         return False
 
     @validator("num_of_executions")
-    def must_be_positive_integer(cls, v):
+    def check_num_of_executions(cls, v):
         if v <= 0 or type(v) != int:
-            raise ValueError('num_of_execution must be a positive integer')
+            raise ValueError("num_of_execution must be a positive integer")
+        return v
+
+    @validator("interval")
+    def check_interval(cls, v):
+        if v < 0 or type(v) not in [int, float]:
+            raise ValueError("interval must be a positive float")
+        return v
+
+    @validator("split_parameters")
+    def check_split_parameters(cls, v):
+        if v and len(v) < cls.num_of_executions:
+            raise ValueError("The length of split_parameters must be the same as num_of_executions")
         return v
 
     def get_num_of_executions(self) -> int:

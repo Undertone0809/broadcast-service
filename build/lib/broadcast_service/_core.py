@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-import traceback
 from typing import Optional, List, Callable
 from concurrent.futures import ThreadPoolExecutor
 from broadcast_service.singleton import Singleton
@@ -23,13 +22,6 @@ __all__ = ['broadcast_service', 'BroadcastService', 'enable_log']
 
 def enable_log():
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-def _thread_callback(callback: Callable, *args, **kwargs):
-    try:
-        callback(*args, **kwargs)
-    except Exception as e:
-        traceback.print_exc()
 
 
 class BroadcastService(metaclass=Singleton):
@@ -144,13 +136,15 @@ class BroadcastService(metaclass=Singleton):
 
         for item in self.pubsub_channels[topic_name]:
             if self.enable_async:
-                self.thread_pool.submit(_thread_callback, item, *args, **kwargs)
+                self.thread_pool.submit(
+                    item, *args, **kwargs)
             else:
                 item(*args, **kwargs)
 
         for item in self.pubsub_channels['__all__']:
             if self.enable_async:
-                self.thread_pool.submit(_thread_callback, item, *args, **kwargs)
+                self.thread_pool.submit(
+                    item, *args, **kwargs)
             else:
                 item(*args, **kwargs)
 

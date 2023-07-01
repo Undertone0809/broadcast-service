@@ -101,7 +101,7 @@ def handle_subscriber_callback():
     print("handle_subscriber_callback")
 
 
-def handle_publisher_callback(*args):
+def handle_publisher_callback():
     print("handle_publisher_callback")
 
 

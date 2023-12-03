@@ -5,14 +5,14 @@
 # @Software: PyCharm
 import time
 from unittest import TestCase
+
 from broadcast_service import broadcast_service
-from broadcast_service.logger import get_logger, enable_log
+from broadcast_service.logger import enable_log, get_logger
 
 logger = get_logger()
 
 
 class TestPublisherCallback(TestCase):
-
     def test_num_of_execution_no_params_no_subscriber(self):
         self.publisher_counter = 0
         self.subscriber_counter = 0
@@ -25,8 +25,7 @@ class TestPublisherCallback(TestCase):
             self.publisher_counter += 1
 
         broadcast_service.config(
-            num_of_executions=5,
-            callback=handle_publisher_callback
+            num_of_executions=5, callback=handle_publisher_callback
         ).publish("no_params_no_subscriber")
 
         self.assertEqual(5, self.publisher_counter)
@@ -46,8 +45,7 @@ class TestPublisherCallback(TestCase):
             self.assertEqual(len(args), self.publisher_counter)
 
         broadcast_service.config(
-            num_of_executions=5,
-            callback=handle_publisher_callback
+            num_of_executions=5, callback=handle_publisher_callback
         ).publish("takes_return_params_and_subscriber")
 
         self.assertEqual(5, self.subscriber_counter)
@@ -74,10 +72,9 @@ class TestPublisherCallback(TestCase):
         def handle_subscriber_callback():
             self.counter += 1
 
-        broadcast_service.config(
-            num_of_executions=5,
-            interval=0.2
-        ).publish("test_interval")
+        broadcast_service.config(num_of_executions=5, interval=0.2).publish(
+            "test_interval"
+        )
 
         duration = time.time() - start_time
         self.assertAlmostEqual(1, duration, delta=0.1)
@@ -88,11 +85,10 @@ class TestPublisherCallback(TestCase):
 
         @broadcast_service.on_listen("test_split_parameter")
         def handle_subscriber_callback(**kwargs):
-            self.assertEqual(self.counter, kwargs['split_parameter'])
+            self.assertEqual(self.counter, kwargs["split_parameter"])
             self.counter += 1
 
         params = [1, 2, 3]
-        broadcast_service.config(
-            num_of_executions=3,
-            split_parameters=params
-        ).publish("test_split_parameter")
+        broadcast_service.config(num_of_executions=3, split_parameters=params).publish(
+            "test_split_parameter"
+        )

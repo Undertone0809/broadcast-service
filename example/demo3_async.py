@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from broadcast_service import broadcast_service
-import time
 import random
+import time
+
+from broadcast_service import broadcast_service
 
 
 class Application:
@@ -35,10 +36,10 @@ class Application:
     """
 
     def __init__(self):
-        self.leader = Leader('Tom')
-        self.staff1 = Staff('Jack')
-        self.staff2 = Staff('Jasmine')
-        self.staff3 = Staff('Jane')
+        self.leader = Leader("Tom")
+        self.staff1 = Staff("Jack")
+        self.staff2 = Staff("Jasmine")
+        self.staff3 = Staff("Jane")
         self.current_time = None
 
     def run(self):
@@ -47,7 +48,7 @@ class Application:
 
 
 def print_time():
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
 
 class Leader:
@@ -55,22 +56,24 @@ class Leader:
         self.name = name
 
     def notice_go_back(self):
-        print('[{1}] {0}(leader) notice meeting now.'.format(
-            self.name, print_time()))
-        meeting_info = 'You guys must go back now!'
-        broadcast_service.broadcast('meeting', meeting_info)
+        print("[{1}] {0}(leader) notice meeting now.".format(self.name, print_time()))
+        meeting_info = "You guys must go back now!"
+        broadcast_service.broadcast("meeting", meeting_info)
 
 
 class Staff:
     def __init__(self, name):
         self.name = name
-        broadcast_service.listen('meeting', self.go_back)
+        broadcast_service.listen("meeting", self.go_back)
 
     def go_back(self, info):
-        print("[{2}] {0}(staff) receive msg '{1}' and go back now.".format(
-            self.name, info, print_time()))
+        print(
+            "[{2}] {0}(staff) receive msg '{1}' and go back now.".format(
+                self.name, info, print_time()
+            )
+        )
         time.sleep(2)
-        print('[{1}] {0}(staff) is back now.'.format(self.name, print_time()))
+        print("[{1}] {0}(staff) is back now.".format(self.name, print_time()))
 
 
 def main():
@@ -79,5 +82,5 @@ def main():
     app.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

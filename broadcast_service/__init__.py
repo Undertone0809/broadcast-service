@@ -17,4 +17,6 @@
 # Project Link: https://github.com/Undertone0809/broadcast-service
 # Contact Email: zeeland@foxmail.com
 
-from ._core import *
+from ._core import broadcast_service, enable_log
+
+__all__ = ["broadcast_service", "enable_log"]

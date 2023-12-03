@@ -17,30 +17,33 @@
 # Project Link: https://github.com/Undertone0809/broadcast-service
 # Contact Email: zeeland@foxmail.com
 
-import time
 import logging
-from pydantic import BaseModel, validator
+import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional, List, Callable, Any, Union
+from typing import Any, Callable, List, Optional, Union
 
-from broadcast_service.singleton import Singleton
+from pydantic import BaseModel, validator
+
 from broadcast_service.logger import enable_log, get_logger
+from broadcast_service.singleton import Singleton
 
-__all__ = ['broadcast_service', 'BroadcastService', 'enable_log']
+__all__ = ["broadcast_service", "BroadcastService", "enable_log"]
 logger = get_logger()
 
 
 def _invoke_callback(
-        callback: Callable,
-        thread_pool: ThreadPoolExecutor,
-        enable_async: bool = True,
-        *args,
-        **kwargs
+    callback: Callable,
+    thread_pool: ThreadPoolExecutor,
+    enable_async: bool = True,
+    *args,
+    **kwargs,
 ) -> Any:
     if enable_async:
         future_result = thread_pool.submit(callback, *args, **kwargs)
         if future_result.result() is not None:
-            logger.debug(f"[broadcast-service invoke_callback result] {future_result.result()}")
+            logger.debug(
+                f"[broadcast-service invoke_callback result] {future_result.result()}"
+            )
             return future_result.result()
     else:
         return callback(*args, **kwargs)
@@ -80,9 +83,7 @@ class BaseBroadcastService(metaclass=Singleton):
             '__all__': [callback_function3: Callable]
         }
         """
-        self.pubsub_channels: dict = {
-            '__all__': []
-        }
+        self.pubsub_channels: dict = {"__all__": []}
         self.enable_async: bool = True
         self.thread_pool = ThreadPoolExecutor(max_workers=5)
         self.logger = logging.getLogger(__name__)
@@ -102,34 +103,39 @@ class BaseBroadcastService(metaclass=Singleton):
         """
         listen topics.
         """
-        if type(topics) == str:
+        if isinstance(topics, str):
             self._invoke_listen_topic(topics, callback)
-        elif type(topics) == list:
+        elif isinstance(topics, list):
             for topic in topics:
                 self._invoke_listen_topic(topic, callback)
         else:
-            raise ValueError("Unknown broadcast-service error, please submit "
-                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
+            raise ValueError(
+                "Unknown broadcast-service error, please submit "
+                "issue to https://github.com/Undertone0809/broadcast-service/issues"
+            )
 
     def listen_all(self, callback: Callable):
         """
         '__all__' is a special topic. It can receive any topic message.
         """
-        self._invoke_listen_topic('__all__', callback)
+        self._invoke_listen_topic("__all__", callback)
 
     def broadcast(self, topics: str or List[str], *args, **kwargs):
         """
-        Launch broadcast on the specify topic. If all subscribe callback finish, it will call finish_callback.
+        Launch broadcast on the specify topic. If all subscribe callback finish, it
+        will call finish_callback.
         """
         self.logger.debug(f"[broadcast-service] broadcast topic <{topics}>")
-        if type(topics) == str:
+        if isinstance(topics, str):
             self._invoke_broadcast_topic(topics, *args, **kwargs)
-        elif type(topics) == list:
+        elif isinstance(topics, list):
             for topic in topics:
                 self._invoke_broadcast_topic(topic, *args, **kwargs)
         else:
-            raise ValueError("Unknown broadcast-service error, please submit "
-                             "issue to https://github.com/Undertone0809/broadcast-service/issues")
+            raise ValueError(
+                "Unknown broadcast-service error, please submit "
+                "issue to https://github.com/Undertone0809/broadcast-service/issues"
+            )
 
     def broadcast_all(self, *args, **kwargs):
         """
@@ -155,13 +161,15 @@ class BaseBroadcastService(metaclass=Singleton):
         for item in self.pubsub_channels[topic_name]:
             self._final_invoke_listen_callback(item, *args, **kwargs)
 
-        for item in self.pubsub_channels['__all__']:
+        for item in self.pubsub_channels["__all__"]:
             if item not in self.pubsub_channels[topic_name]:
                 self._final_invoke_listen_callback(item, *args, **kwargs)
 
     def _final_invoke_listen_callback(self, callback: Callable, *args, **kwargs) -> Any:
         self.logger.debug(f"[broadcast-service] {callback.__name__} is called")
-        return _invoke_callback(callback, self.thread_pool, self.enable_async, *args, **kwargs)
+        return _invoke_callback(
+            callback, self.thread_pool, self.enable_async, *args, **kwargs
+        )
 
     def stop_listen(self, topic_name: str, callback: Callable):
         if topic_name not in self.pubsub_channels.keys():
@@ -172,7 +180,8 @@ class BaseBroadcastService(metaclass=Singleton):
             self.pubsub_channels[topic_name].remove(callback)
 
     def on_listen(self, topics: str or Optional[List[str]] = None) -> Callable:
-        """Decorator to listen specify topic. If topics is none, then listen all topics has exits.
+        """Decorator to listen specify topic. If topics is none, then listen all topics
+        has exits.
 
         Args:
             topics: topic list, you can input topic like: ["topic1", "topic2"].
@@ -198,15 +207,18 @@ class BaseBroadcastService(metaclass=Singleton):
                 # your code
 
         Attention:
-            Your params should keep '*args, **kwargs'. If you publish a topic take arguments,
-            the callback function you handle should take arguments, otherwise it will not be called back.
+            Your params should keep '*args, **kwargs'. If you publish a topic take
+            arguments, the callback function you handle should take arguments, otherwise
+            it will not be called back.
         """
 
         def decorator(fn: Callable) -> Callable:
-            self.logger.debug(f"[broadcast-service] <{fn.__name__}> listen <{topics}> topic")
+            self.logger.debug(
+                f"[broadcast-service] <{fn.__name__}> listen <{topics}> topic"
+            )
             if not topics:
                 self.listen_all(fn)
-            elif type(topics) == str or list:
+            elif isinstance(topics, str) or isinstance(topics, list):
                 self.listen(topics, fn)
 
             def inner(*args, **kwargs) -> Callable:
@@ -219,9 +231,9 @@ class BaseBroadcastService(metaclass=Singleton):
 
 
 PUBLISHER_CALLBACK_STATUS = {
-    "INIT": 'initialization',
+    "INIT": "initialization",
     "RUNNING": "running",
-    "END": "end"
+    "END": "end",
 }
 
 
@@ -237,15 +249,17 @@ class PublisherDispatchConfig(BaseModel):
     subscriber_callback_results: Union[dict, List] = []
     """Used to store the return values of all callback functions for subscribers."""
     callback: Optional[Callable] = None
-    """Your publisher will obtain the callback and subscriber parameters after the callback function
-    of all subscribers callback is completed."""
+    """Your publisher will obtain the callback and subscriber parameters after the
+    callback function of all subscribers callback is completed."""
     enable_final_return: bool = False
-    """This parameter indicates whether you want to call the publisher callback after calling the topic 
-    n times, or call the publisher callback after each topic publishing."""
+    """This parameter indicates whether you want to call the publisher callback after
+    calling the topic n times, or call the publisher callback after each topic
+    publishing."""
     split_parameters: Optional[List[Any]] = None
-    """If you initiate multiple calls and want to pass different parameters to the subscriber in each 
-    call, you can use this parameter for parameter passing. Additionally, when you use this parameter, 
-    you do not need to pass any parameters in the broadcast() function."""
+    """If you initiate multiple calls and want to pass different parameters to the
+    subscriber in each call, you can use this parameter for parameter passing.
+    Additionally, when you use this parameter, you do not need to pass any parameters
+    in the broadcast() function."""
 
     @property
     def start_publisher_callback_or_not(self) -> bool:
@@ -259,7 +273,7 @@ class PublisherDispatchConfig(BaseModel):
 
     @validator("num_of_executions")
     def check_num_of_executions(cls, v):
-        if v <= 0 or type(v) != int:
+        if v <= 0 or not isinstance(v, int):
             raise ValueError("num_of_execution must be a positive integer")
         return v
 
@@ -272,7 +286,9 @@ class PublisherDispatchConfig(BaseModel):
     @validator("split_parameters")
     def check_split_parameters(cls, v):
         if v and len(v) < cls.num_of_executions:
-            raise ValueError("The length of split_parameters must be the same as num_of_executions")
+            raise ValueError(
+                "The length of split_parameters must be the same as num_of_executions"
+            )
         return v
 
     def get_num_of_executions(self) -> int:
@@ -281,7 +297,7 @@ class PublisherDispatchConfig(BaseModel):
         return self.num_of_executions
 
     def finish_callback(self):
-        logger.debug(f"[broadcast-service] publisher finish callback task")
+        logger.debug("[broadcast-service] publisher finish callback task")
         self.status = PUBLISHER_CALLBACK_STATUS["END"]
 
     def append_sub_callback_results(self, value: Any):
@@ -303,33 +319,38 @@ class BroadcastService(BaseBroadcastService):
     def __init__(self):
         super().__init__()
         self.publish_dispatch_config_manager = PublisherDispatchConfigManager()
-        self.cur_publisher_dispatch_config: PublisherDispatchConfig = PublisherDispatchConfig()
+        self.cur_publisher_dispatch_config = PublisherDispatchConfig()
 
         self.enable_config = False
-        """Enable_config is True when you use `broadcast_service.config(**config).publish(topic_name,**params)`
-        to publish topic. It indicates whether you need to enable complex configurations to schedule 
-        publishing topics."""
+        """Enable_config is True when you use
+        `broadcast_service.config(**config). publish(topic_name,**params)` to publish
+        topic. It indicates whether you need to enable complex configurations to
+        schedule publishing topics."""
 
     def config(
-            self,
-            num_of_executions: int = 1,
-            callback: Optional[Callable] = None,
-            enable_final_return: bool = False,
-            interval: float = 0,
-            split_parameters: Optional[List[Any]] = None
-    ) -> 'BroadcastService':
+        self,
+        num_of_executions: int = 1,
+        callback: Optional[Callable] = None,
+        enable_final_return: bool = False,
+        interval: float = 0,
+        split_parameters: Optional[List[Any]] = None,
+    ) -> "BroadcastService":
         """Provide more complex topic publish mode
 
         Args:
-            num_of_executions: default is 1, indicating the number of times the same topic is published at once
-            callback: default is None. You can get callback and the parameters of subscriber
-                after all subscribers' callback functions have been completed.
-            enable_final_return: default is False, it means you can get callback after you publish
-                n times topic. In this case, finish_callback params is store in *args rather than **kwargs.
+            num_of_executions: default is 1, indicating the number of times the same
+                topic is published at once.
+            callback: default is None. You can get callback and the parameters of
+                subscriber after all subscribers' callback functions have been
+                completed.
+            enable_final_return: default is False, it means you can get callback after
+                you publish n times topic. In this case, finish_callback params is store
+                in *args rather than **kwargs.
             interval: publish interval. Unit seconds.
-            split_parameters: If you initiate multiple calls and want to pass different parameters to the subscriber
-                in each call, you can use this parameter for parameter passing. Additionally, when you use this
-                parameter, you do not need to pass any parameters in the broadcast() function.
+            split_parameters: If you initiate multiple calls and want to pass different
+                parameters to the subscriber in each call, you can use this parameter
+                for parameter passing. Additionally, when you use this parameter, you
+                do not need to pass any parameters in the broadcast() function.
         Returns:
             Returns current object, which is used to call broadcast with configuration.
         """
@@ -339,19 +360,25 @@ class BroadcastService(BaseBroadcastService):
             callback=callback,
             enable_final_return=enable_final_return,
             interval=interval,
-            status=PUBLISHER_CALLBACK_STATUS['RUNNING'],
-            split_parameters=split_parameters
+            status=PUBLISHER_CALLBACK_STATUS["RUNNING"],
+            split_parameters=split_parameters,
         )
         return self
 
     def broadcast(self, topics: str or List[str], *args, **kwargs):
         if self.enable_config:
-            self.cur_publisher_dispatch_config = self.publish_dispatch_config_manager.get_latest_publisher_callback()
+            self.cur_publisher_dispatch_config = (
+                self.publish_dispatch_config_manager.get_latest_publisher_callback()
+            )
 
         for i in range(self.cur_publisher_dispatch_config.get_num_of_executions()):
             if self.cur_publisher_dispatch_config.split_parameters:
                 kwargs.update(
-                    {"split_parameter": self.cur_publisher_dispatch_config.split_parameters[i]}
+                    {
+                        "split_parameter": self.cur_publisher_dispatch_config.split_parameters[
+                            i
+                        ]
+                    }
                 )
             super().broadcast(topics, *args, **kwargs)
             self.cur_publisher_dispatch_config.counter += 1
@@ -363,17 +390,24 @@ class BroadcastService(BaseBroadcastService):
         if self.cur_publisher_dispatch_config.callback:
             self._final_invoke_listen_callback(
                 self.cur_publisher_dispatch_config.callback,
-                *self.cur_publisher_dispatch_config.subscriber_callback_results
+                *self.cur_publisher_dispatch_config.subscriber_callback_results,
             )
-        if self.cur_publisher_dispatch_config.counter == self.cur_publisher_dispatch_config.num_of_executions:
+        if (
+            self.cur_publisher_dispatch_config.counter
+            == self.cur_publisher_dispatch_config.num_of_executions
+        ):
             self.cur_publisher_dispatch_config.finish_callback()
 
     def _invoke_broadcast_topic(self, topic_name: str, *args, **kwargs):
         super()._invoke_broadcast_topic(topic_name, *args, **kwargs)
 
         logger.debug(
-            f"[broadcast-service] start_publisher_callback_or_not: {self.cur_publisher_dispatch_config.start_publisher_callback_or_not}")
-        if self.enable_config and self.cur_publisher_dispatch_config.start_publisher_callback_or_not:
+            f"[broadcast-service] start_publisher_callback_or_not: {self.cur_publisher_dispatch_config.start_publisher_callback_or_not}"  # noqa
+        )
+        if (
+            self.enable_config
+            and self.cur_publisher_dispatch_config.start_publisher_callback_or_not
+        ):
             self._invoke_finish_callback()
 
     def _final_invoke_listen_callback(self, callback: Callable, *args, **kwargs):

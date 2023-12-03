@@ -17,13 +17,13 @@
 # Project Link: https://github.com/Undertone0809/broadcast-service
 # Contact Email: zeeland@foxmail.com
 
-import os
-import logging
-import tempfile
 import datetime
+import logging
+import os
 import platform
+import tempfile
 
-__all__ = ['get_logger', 'enable_log_no_file', 'enable_log']
+__all__ = ["get_logger", "enable_log_no_file", "enable_log"]
 logger = logging.getLogger("cushy-storage")
 
 
@@ -36,7 +36,7 @@ def get_project_root_path() -> str:
     project_path = os.getcwd()
     max_depth = 10
     count = 0
-    while not os.path.exists(os.path.join(project_path, 'README.md')):
+    while not os.path.exists(os.path.join(project_path, "README.md")):
         project_path = os.path.split(project_path)[0]
         count += 1
         if count > max_depth:
@@ -44,17 +44,16 @@ def get_project_root_path() -> str:
     return project_path
 
 
-STORAGE_PATH = {
-    'PROJECT_ROOT': get_project_root_path(),
-    'CURRENT': "./"
-}
+STORAGE_PATH = {"PROJECT_ROOT": get_project_root_path(), "CURRENT": "./"}
 
 
-def get_default_storage_path(file_name: str, root_path: str = STORAGE_PATH['PROJECT_ROOT']) -> str:
-    if platform.system() == 'Windows':
+def get_default_storage_path(
+    file_name: str, root_path: str = STORAGE_PATH["PROJECT_ROOT"]
+) -> str:
+    if platform.system() == "Windows":
         return f"{root_path}/{file_name}"
-    elif platform.system() == 'Linux' or 'Darwin':
-        dir_path = os.environ.get('TMPDIR')
+    elif platform.system() == "Linux" or "Darwin":
+        dir_path = os.environ.get("TMPDIR")
         if not dir_path:
             dir_path = tempfile.gettempdir()
         dir_path = os.path.join(dir_path, "broadcast_service")
@@ -75,7 +74,7 @@ def _check_log_path():
 
 def get_log_name() -> str:
     _check_log_path()
-    cur_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    cur_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     return f"{get_default_log_path()}/log_{cur_time}.log"
 
 
@@ -83,11 +82,11 @@ def enable_log():
     """enable logging to terminal and file"""
     logging.basicConfig(
         level=logging.DEBUG,
-        format='%(levelname)s - %(asctime)s:%(message)s -',
-        datefmt='%Y-%m-%d %H:%M:%S',
+        format="%(levelname)s - %(asctime)s:%(message)s -",
+        datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
-            logging.FileHandler(f"{get_log_name()}", mode='w', encoding='utf-8'),
-            logging.StreamHandler()
+            logging.FileHandler(f"{get_log_name()}", mode="w", encoding="utf-8"),
+            logging.StreamHandler(),
         ],
     )
 
@@ -95,6 +94,6 @@ def enable_log():
 def enable_log_no_file():
     logging.basicConfig(
         level=logging.DEBUG,
-        format='[%(levelname)s] %(asctime)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
+        format="[%(levelname)s] %(asctime)s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )

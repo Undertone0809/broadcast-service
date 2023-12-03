@@ -5,6 +5,7 @@
 # @Software: PyCharm
 
 import logging
+
 from broadcast_service import broadcast_service
 
 logging.basicConfig(level=logging.DEBUG)
@@ -23,6 +24,6 @@ class Component:
         broadcast_service.broadcast("activate component", self, "ohohohohoh")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     c1 = Component()
     c1.method()

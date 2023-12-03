@@ -1,0 +1,107 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.poetry]
+authors = ["Zeeland <zeeland4work@gmail.com>"]
+description = "A lightweight third-party broadcast/pubsub library"
+name = "broadcast-service"
+readme = "README.md"
+repository = "https://github.com/Undertone0809/broadcast-service"
+version = "2.1.0"
+keywords = [
+    "broadcast",
+    "broadcast-service",
+    "publisher",
+    "subscriber",
+    "pubsub",
+]
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+license="Apache 2.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pydantic = "^1.8.2"
+cushy-storage = "^1.2.5"
+loguru = "^0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+coverage = "^6.1.2"
+coverage-badge = "^1.1.0"
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+pytest-html = "^3.1.1"
+ruff = "^0.1.4"
+
+[[tool.poetry.source]]
+name = "tsinghua"
+priority = "default"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[tool.ruff]
+# https://beta.ruff.rs/docs/settings/
+# https://docs.astral.sh/ruff/configuration/
+line-length = 88
+
+# https://beta.ruff.rs/docs/rules/
+extend-select = ["I"]
+ignore = ["F401"]
+select = ["E", "W", "F", "I"]
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".nox",
+  ".pants.d",
+  ".pytype",
+  ".ruff_cache",
+  ".svn",
+  ".tox",
+  ".venv",
+  "__pypackages__",
+  "_build",
+  "buck-out",
+  "build",
+  "dist",
+  "node_modules",
+  "venv",
+]
+ignore-init-module-imports = true
+respect-gitignore = true
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.coverage.run]
+source = ["tests"]
+
+[coverage.report]
+fail_under = 50
+show_missing = true

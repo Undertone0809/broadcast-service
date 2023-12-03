@@ -14,6 +14,7 @@
 
 import time
 import unittest
+
 from broadcast_service import broadcast_service
 
 
@@ -39,5 +40,5 @@ class TestAsync(unittest.TestCase):
         self.assertEqual(int(used_time), 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

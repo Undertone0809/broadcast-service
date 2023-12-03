@@ -24,11 +24,8 @@ from typing import Any, Callable, List, Optional, Union
 
 from pydantic import BaseModel, validator
 
-from broadcast_service.logger import enable_log, get_logger
+from broadcast_service.logger import logger
 from broadcast_service.singleton import Singleton
-
-__all__ = ["broadcast_service", "BroadcastService", "enable_log"]
-logger = get_logger()
 
 
 def _invoke_callback(
@@ -375,7 +372,7 @@ class BroadcastService(BaseBroadcastService):
             if self.cur_publisher_dispatch_config.split_parameters:
                 kwargs.update(
                     {
-                        "split_parameter": self.cur_publisher_dispatch_config.split_parameters[
+                        "split_parameter": self.cur_publisher_dispatch_config.split_parameters[  # noqa
                             i
                         ]
                     }

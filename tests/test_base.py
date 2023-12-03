@@ -16,9 +16,6 @@ import time
 from unittest import TestCase
 
 from broadcast_service import broadcast_service
-from broadcast_service.logger import enable_log, get_logger
-
-logger = get_logger()
 
 
 def wait(seconds=0.1):

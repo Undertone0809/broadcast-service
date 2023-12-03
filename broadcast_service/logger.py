@@ -18,82 +18,53 @@
 # Contact Email: zeeland@foxmail.com
 
 import datetime
-import logging
 import os
-import platform
+import sys
 import tempfile
 
-__all__ = ["get_logger", "enable_log_no_file", "enable_log"]
-logger = logging.getLogger("cushy-storage")
+from loguru import logger as _logger
+
+from broadcast_service.singleton import Singleton
 
 
-def get_logger():
-    return logger
+def convert_backslashes(path: str):
+    """Convert all \\ to / of file path."""
+    return path.replace("\\", "/")
 
 
-def get_project_root_path() -> str:
-    """get project root path"""
-    project_path = os.getcwd()
-    max_depth = 10
-    count = 0
-    while not os.path.exists(os.path.join(project_path, "README.md")):
-        project_path = os.path.split(project_path)[0]
-        count += 1
-        if count > max_depth:
-            return os.getcwd()
-    return project_path
+def get_default_storage_path(module_name: str = "") -> str:
+    pne_storage_path = os.path.expanduser("~/.broadcast_service")
+
+    if not os.path.exists(pne_storage_path):
+        try:
+            os.makedirs(pne_storage_path)
+        except PermissionError:
+            pne_storage_path = f"{tempfile.gettempdir()}/broadcast_service"
+
+    return convert_backslashes(f"{pne_storage_path}/{module_name}")
 
 
-STORAGE_PATH = {"PROJECT_ROOT": get_project_root_path(), "CURRENT": "./"}
-
-
-def get_default_storage_path(
-    file_name: str, root_path: str = STORAGE_PATH["PROJECT_ROOT"]
-) -> str:
-    if platform.system() == "Windows":
-        return f"{root_path}/{file_name}"
-    elif platform.system() == "Linux" or "Darwin":
-        dir_path = os.environ.get("TMPDIR")
-        if not dir_path:
-            dir_path = tempfile.gettempdir()
-        dir_path = os.path.join(dir_path, "broadcast_service")
-        return f"{dir_path}/{file_name}"
-    else:
-        return f"./{file_name}"
-
-
-def get_default_log_path() -> str:
-    return get_default_storage_path("log")
-
-
-def _check_log_path():
-    """check whether log file exist"""
-    if not os.path.exists(get_default_log_path()):
-        os.makedirs(get_default_log_path())
-
-
-def get_log_name() -> str:
-    _check_log_path()
-    cur_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{get_default_log_path()}/log_{cur_time}.log"
+def get_log_path() -> str:
+    log_directory = get_default_storage_path("logs")
+    current_time = datetime.datetime.now().strftime("%Y%m%d")
+    return f"{log_directory}/{current_time}.log"
 
 
 def enable_log():
-    """enable logging to terminal and file"""
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(levelname)s - %(asctime)s:%(message)s -",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[
-            logging.FileHandler(f"{get_log_name()}", mode="w", encoding="utf-8"),
-            logging.StreamHandler(),
-        ],
-    )
+    logger.remove()
+
+    logger.add(get_log_path(), level="DEBUG")
+    logger.add(sys.stderr, level="DEBUG")
 
 
-def enable_log_no_file():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="[%(levelname)s] %(asctime)s %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+class Logger(metaclass=Singleton):
+    def __init__(self) -> None:
+        self.logger = _logger
+
+        self.logger.remove()
+
+        self.logger.add(get_log_path(), level="DEBUG")
+        self.logger.add(sys.stderr, level="WARNING")
+
+
+logger = Logger().logger

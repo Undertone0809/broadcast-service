@@ -39,9 +39,11 @@ def _invoke_callback(
 ) -> Any:
     if enable_async:
         future_result = thread_pool.submit(callback, *args, **kwargs)
-        if future_result.result() is not None:
-            logger.debug(f"[broadcast-service invoke_callback result] {future_result.result()}")
-            return future_result.result()
+        def handle_future_result(future):
+            result = future.result()
+            if result is not None:
+                logger.debug(f"[broadcast-service invoke_callback result] {result}")
+        future_result.add_done_callback(handle_future_result)
     else:
         return callback(*args, **kwargs)
 
@@ -161,7 +163,8 @@ class BaseBroadcastService(metaclass=Singleton):
 
     def _final_invoke_listen_callback(self, callback: Callable, *args, **kwargs) -> Any:
         self.logger.debug(f"[broadcast-service] {callback.__name__} is called")
-        return _invoke_callback(callback, self.thread_pool, self.enable_async, *args, **kwargs)
+        _invoke_callback(callback, self.thread_pool, self.enable_async, *args, **kwargs)
+        return None
 
     def stop_listen(self, topic_name: str, callback: Callable):
         if topic_name not in self.pubsub_channels.keys():
@@ -375,12 +378,11 @@ class BroadcastService(BaseBroadcastService):
             f"[broadcast-service] start_publisher_callback_or_not: {self.cur_publisher_dispatch_config.start_publisher_callback_or_not}")
         if self.enable_config and self.cur_publisher_dispatch_config.start_publisher_callback_or_not:
             self._invoke_finish_callback()
+        return None
 
     def _final_invoke_listen_callback(self, callback: Callable, *args, **kwargs):
-        result = super()._final_invoke_listen_callback(callback, *args, **kwargs)
-
-        if result:
-            self.cur_publisher_dispatch_config.append_sub_callback_results(result)
+        super()._final_invoke_listen_callback(callback, *args, **kwargs)
+        return None
 
 
 broadcast_service = BroadcastService()

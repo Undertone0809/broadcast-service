@@ -39,9 +39,15 @@ def _invoke_callback(
 ) -> Any:
     if enable_async:
         future_result = thread_pool.submit(callback, *args, **kwargs)
-        if future_result.result() is not None:
-            logger.debug(f"[broadcast-service invoke_callback result] {future_result.result()}")
-            return future_result.result()
+        def handle_future(future):
+            try:
+                result = future.result()
+                if result is not None:
+                    logger.debug(f"[broadcast-service invoke_callback result] {result}")
+                    return result
+            except Exception as e:
+                logger.error(f"[broadcast-service invoke_callback error] {str(e)}")
+        future_result.add_done_callback(handle_future)
     else:
         return callback(*args, **kwargs)
 

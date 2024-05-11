@@ -34,9 +34,9 @@ def main():
         num_of_executions=5,
         callback=handle_publisher_callback,
         enable_final_return=True,
-        interval=0.1
+        interval=0.1,
     ).publish("topic")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -20,7 +20,6 @@ from broadcast_service import broadcast_service
 
 
 class Person:
-
     def __init__(self, name: str) -> None:
         self.name = name
 
@@ -33,7 +32,6 @@ class Person:
 
 
 class Market:
-
     def send_milk(self):
         print("Market send milk")
         broadcast_service.broadcast("milk")
@@ -48,5 +46,5 @@ def main():
     m.send_milk()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

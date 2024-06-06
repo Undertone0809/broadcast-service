@@ -42,7 +42,7 @@ coverage-badge = "^1.1.0"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 pytest-html = "^3.1.1"
-ruff = "^0.1.4"
+ruff = ">=0.1.4,<0.5.0"
 
 [[tool.poetry.source]]
 name = "tsinghua"
